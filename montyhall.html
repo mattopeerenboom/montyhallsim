@@ -64,6 +64,7 @@
             const style = document.getElementById("style").value;
             const montyType = document.getElementById("monty-type").value;
             let wins = 0;
+            let immediateLosses = 0;
 
             for (let i = 0; i < iterations; i++) {
                 let doors = [0, 0, 0];
@@ -90,6 +91,7 @@
 
                     // If Monty reveals the prize, the contestant loses
                     if (montyType === "neutral-without-info" && revealed === prize) {
+                        immediateLosses++;
                         continue;
                     }
 
@@ -108,7 +110,14 @@
                 }
             }
 
-            document.getElementById("result").innerText = `Win rate: ${wins / iterations * 100}%`;
+            if (montyType === "neutral-without-info") {
+                document.getElementById("result").innerHTML = `Immediate losses: ${immediateLosses / iterations * 100}%
+                <br/>Overall Win rate: ${wins / iterations * 100}%. 
+                <br/>Win rate if choice: ${wins / (iterations-immediateLosses) * 100}%. 
+                `;
+            } else {
+                document.getElementById("result").innerText = `Win rate: ${wins / iterations * 100}%`;
+            }
         }
 
 
