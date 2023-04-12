@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monty Hall Problem Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Monty Hall Problem Simulator</h1>
+        <label for="iterations">Number of iterations:</label>
+        <input type="number" id="iterations" value="100000">
+        <br><br>
+        <label for="style">Style of play:</label>
+        <select id="style" onchange="updateDescription()">
+            <option value="always-switch">Always switch</option>
+            <option value="never-switch">Never switch</option>
+        </select>
+        <p id="style-description"></p>
+        <br>
+        <label for="monty-type">Monty Hall type:</label>
+        <select id="monty-type" onchange="updateDescription()">
+            <option value="evil">Evil</option>
+            <option value="neutral">Neutral with information</option>
+            <option value="neutral-without-info">Neutral without information</option>
+            <option value="helpful">Helpful</option>
+        </select>
+        <p id="monty-description"></p>
+        <br>
+        <button onclick="simulate()">Start</button>
+        <h2 id="result"></h2>
+    </div>
+
+    <script>
+        function simulate() {
+            const iterations = parseInt(document.getElementById("iterations").value, 10);
+            const style = document.getElementById("style").value;
+            const montyType = document.getElementById("monty-type").value;
+            let wins = 0;
+
+            for (let i = 0; i < iterations; i++) {
+                let doors = [0, 0, 0];
+                let prize = Math.floor(Math.random() * 3);
+                doors[prize] = 1;
+                let choice = Math.floor(Math.random() * 3);
+                let revealed = 3;
+                let shouldOfferSwitch = false;
+
+                if (montyType === "evil" && doors[choice] === 1) {
+                    shouldOfferSwitch = true;
+                } else if (montyType === "neutral") {
+                    shouldOfferSwitch = true;
+                } else if (montyType === "helpful" && doors[choice] === 0) {
+                    shouldOfferSwitch = true;
+                } else if (montyType === "neutral-without-info") {
+                    shouldOfferSwitch = true;
+                }
+
+                if (shouldOfferSwitch) {
+                    do {
+                        revealed = Math.floor(Math.random() * 3);
+                    } while (revealed === choice || (doors[revealed] === 1 && montyType !== "neutral-without-info"));
+
+                    // If Monty reveals the prize, the contestant loses
+                    if (montyType === "neutral-without-info" && revealed === prize) {
+                        continue;
+                    }
+
+                    if (style === "always-switch") {
+                        for (let j = 0; j < 3; j++) {
+                            if (j !== choice && j !== revealed) {
+                                choice = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (doors[choice] === 1) {
+                    wins++;
+                }
+            }
+
+            document.getElementById("result").innerText = `Win rate: ${wins / iterations * 100}%`;
+        }
+
+
+        // Rest of the code including the updated updateDescription() function
+
+        // Call updateDescription on page load to display the initial descriptions
+        updateDescription();
+
+
+
+        function updateDescription() {
+            const style = document.getElementById("style").value;
+            const montyType = document.getElementById("monty-type").value;
+            let styleDescription = '';
+            let montyDescription = '';
+
+            if (style === 'always-switch') {
+                styleDescription = 'You always switch doors after one is revealed.';
+            } else {
+                styleDescription = 'You never switch doors after one is revealed.';
+            }
+
+            if (montyType === 'evil') {
+                montyDescription = 'Monty only offers to switch if you picked the winning door.';
+            } else if (montyType === 'neutral') {
+                montyDescription = 'Monty always offers to switch regardless of your choice.';
+            } else if (montyType === 'helpful') {
+                montyDescription = 'Monty only offers to switch if you picked the losing door.';
+            } else if (montyType === 'neutral-without-info') {
+                montyDescription = 'Monty always opens a door, but sometimes reveals the prize and the contestant loses.';
+            }
+
+            document.getElementById("style-description").innerText = styleDescription;
+            document.getElementById("monty-description").innerText = montyDescription;
+        }
+
+        // Rest of the code including the updated simulate() function
+
+        // Call updateDescription on page load to display the initial descriptions
+        updateDescription();
+
+    </script>
+</body>
+
+</html>
